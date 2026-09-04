@@ -16,7 +16,7 @@ import kotlinx.coroutines.delay
 data class CoinUiState(val coins: List<Coin> = emptyList(), val loading: Boolean = false, val error: String? = null)
 class CoinViewModel(private val repository: CoinRepository) : ViewModel() {
     private val quotes = MutableStateFlow<List<Coin>>(emptyList()); private val loading = MutableStateFlow(false); private val error = MutableStateFlow<String?>(null)
-    val state: StateFlow<CoinUiState> = combine(quotes, loading, error, repository.observeFavorites()) { coins, isLoading, message, favs -> CoinUiState(coins.map { it.copy(isFavorite = it.id in favs) }, isLoading, message) }.let { flow -> kotlinx.coroutines.flow.stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000), CoinUiState()) }
+    val state: StateFlow<CoinUiState> = combine(quotes, loading, error, repository.observeFavorites()) { coins, isLoading, message, favs -> CoinUiState(coins.map { it.copy(isFavorite = it.id in favs) }, isLoading, message) }.let { flow -> flow.stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000), CoinUiState()) }
     init {
         refresh()
         viewModelScope.launch { while (true) { delay(30_000); refresh() } }
